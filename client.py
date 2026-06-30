@@ -21,6 +21,60 @@ APPTAGS = {
     "/ws/direction/v1/transit": "lbsdirection_transit",
 }
 
+_DATE_SEP_RE = re.compile(r"^\s*(\d{1,4})[\./\-](\d{1,2})(?:[\./\-](\d{1,2}))?\s*$")
+
+
+def _parse_date(value: str) -> "date":
+    """Accept flexible date strings:
+    - ISO format: 2026-06-30, 2026-6-30
+    - Chinese style: 6.30, 06.30, 6/30, 6-30
+    - With year: 2026.6.30, 2026/6/30
+    Defaults to current year if not specified.
+    """
+    if not value:
+        return date.today()
+    value = value.strip()
+    # Try ISO first
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        pass
+    # Try common separators: . / -
+    m = _DATE_SEP_RE.match(value)
+    if m:
+        year_str, month_str, day_str = m.group(1), m.group(2), m.group(3)
+        month = int(month_str)
+        day = int(day_str) if day_str else 1
+        if len(year_str) >= 4:
+            year = int(year_str)
+        else:
+            year = date.today().year
+            try:
+                candidate = date(year, month, day)
+                if candidate < date.today():
+                    year += 1
+                    candidate = date(year, month, day)
+            except ValueError:
+                # clamp day to max for month
+                import calendar
+                max_day = calendar.monthrange(year, month)[1]
+                day = min(day, max_day)
+                candidate = date(year, month, day)
+            return candidate
+        try:
+            return date(year, month, day)
+        except ValueError:
+            import calendar
+            max_day = calendar.monthrange(year, month)[1]
+            return date(year, month, min(day, max_day))
+    # Last resort: try strptime with Chinese-style formats
+    for fmt in ("%Y年%m月%d日", "%m月%d日", "%Y/%m/%d", "%m/%d"):
+        try:
+            return date.strptime(value, fmt).date()
+        except ValueError:
+            continue
+    return date.today()
+
 
 class TencentMapError(RuntimeError):
     pass
@@ -194,7 +248,7 @@ class TencentMapClient:
         warnings: list[str] = []
         total_distance = 0.0
         total_budget = 0.0
-        parsed_start = date.fromisoformat(start_date)
+        parsed_start = _parse_date(start_date)
         times = ["09:00", "11:30", "14:30", "17:30"]
         per_day = min(4, max(3, len(candidates) // days))
         for day_number in range(1, days + 1):
@@ -213,7 +267,7 @@ class TencentMapClient:
                 nearest_index = min(
                     range(len(pool)),
                     key=lambda index: (
-                        pool[index]["location"]["lat"] - previous["lat"]
+                        (pool[index]["location"]["lat"] - previous["lat"]
                     ) ** 2 + (
                         pool[index]["location"]["lng"] - previous["lng"]
                     ) ** 2,
