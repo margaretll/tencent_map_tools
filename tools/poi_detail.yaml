@@ -1,0 +1,8 @@
+identity: { name: poi_detail, author: liuxin, label: { en_US: POI Detail, zh_Hans: POI 详情 } }
+description:
+  human: { en_US: Get one Tencent Map POI., zh_Hans: 获取单个腾讯地图 POI 详情。 }
+  llm: Get verified details for a Tencent POI id.
+parameters:
+  - { name: poi_id, type: string, required: true, label: { en_US: POI ID, zh_Hans: POI ID }, form: llm, human_description: { en_US: Tencent POI id, zh_Hans: 腾讯 POI ID } }
+output_schema: { type: object, properties: { result: { type: object } } }
+extra: { python: { source: tools/poi_detail.py } }

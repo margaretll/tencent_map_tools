@@ -1,0 +1,29 @@
+identity:
+  author: liuxin
+  name: tencent_map
+  label:
+    en_US: Tencent Map
+    zh_Hans: 腾讯地图
+  description:
+    en_US: Verified places and routes from Tencent Map.
+    zh_Hans: 来自腾讯地图的真实地点与路线。
+  icon: icon.svg
+credentials_for_provider:
+  tmap_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: Tencent Map WebService Key
+      zh_Hans: 腾讯地图 WebService Key
+    help:
+      en_US: Keep this server-side key private and restrict it in the Tencent console.
+      zh_Hans: 请使用服务端 Key，并在腾讯位置服务控制台限制用途。
+tools:
+  - tools/poi_search.yaml
+  - tools/poi_detail.yaml
+  - tools/geocoder.yaml
+  - tools/direction.yaml
+  - tools/build_itinerary.yaml
+extra:
+  python:
+    source: provider/tencent_map.py

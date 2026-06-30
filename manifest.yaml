@@ -1,0 +1,30 @@
+version: 0.1.2
+type: plugin
+author: liuxin
+name: tencent_map_tools
+label:
+  en_US: Tencent Map Tools
+  zh_Hans: 腾讯地图工具
+description:
+  en_US: Read-only Tencent Map POI, geocoding, route and itinerary tools.
+  zh_Hans: 只读的腾讯地图 POI、地理编码、路线与行程工具。
+icon: icon.svg
+resource:
+  memory: 268435456
+  permission:
+    tool:
+      enabled: true
+plugins:
+  tools:
+    - provider/tencent_map.yaml
+meta:
+  version: 0.1.2
+  arch: [amd64, arm64]
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+  minimum_dify_version: 1.0.0
+created_at: 2026-06-28T10:00:00+08:00
+privacy: PRIVACY.md
+verified: false

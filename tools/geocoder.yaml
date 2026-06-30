@@ -1,0 +1,8 @@
+identity: { name: geocoder, author: liuxin, label: { en_US: Geocoder, zh_Hans: 地址解析 } }
+description:
+  human: { en_US: Convert an address to GCJ-02 coordinates., zh_Hans: 将地址转换为 GCJ-02 坐标。 }
+  llm: Resolve a Chinese address or landmark to verified GCJ-02 coordinates.
+parameters:
+  - { name: address, type: string, required: true, label: { en_US: Address, zh_Hans: 地址 }, form: llm, human_description: { en_US: Full address or landmark, zh_Hans: 完整地址或地标 } }
+output_schema: { type: object, properties: { result: { type: object } } }
+extra: { python: { source: tools/geocoder.py } }

@@ -1,0 +1,21 @@
+identity: { name: direction, author: liuxin, label: { en_US: Route Planning, zh_Hans: 路线规划 } }
+description:
+  human: { en_US: Plan a real Tencent Map route., zh_Hans: 规划腾讯地图真实路线。 }
+  llm: Plan a route between two addresses using driving, walking, transit or bicycling.
+parameters:
+  - { name: origin, type: string, required: true, label: { en_US: Origin, zh_Hans: 起点 }, form: llm, human_description: { en_US: Origin address, zh_Hans: 起点地址 } }
+  - { name: destination, type: string, required: true, label: { en_US: Destination, zh_Hans: 终点 }, form: llm, human_description: { en_US: Destination address, zh_Hans: 终点地址 } }
+  - name: mode
+    type: select
+    required: true
+    default: transit
+    options:
+      - { value: transit, label: { en_US: Transit, zh_Hans: 公共交通 } }
+      - { value: walking, label: { en_US: Walking, zh_Hans: 步行 } }
+      - { value: driving, label: { en_US: Driving, zh_Hans: 驾车 } }
+      - { value: bicycling, label: { en_US: Cycling, zh_Hans: 骑行 } }
+    label: { en_US: Mode, zh_Hans: 方式 }
+    form: llm
+    human_description: { en_US: Travel mode, zh_Hans: 出行方式 }
+output_schema: { type: object, properties: { result: { type: object } } }
+extra: { python: { source: tools/direction.py } }

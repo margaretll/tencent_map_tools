@@ -1,0 +1,13 @@
+identity:
+  name: poi_search
+  author: liuxin
+  label: { en_US: POI Search, zh_Hans: POI 搜索 }
+description:
+  human: { en_US: Search verified Tencent Map places., zh_Hans: 搜索腾讯地图真实地点。 }
+  llm: Search verified POIs by keyword and city. Never invent missing places.
+parameters:
+  - { name: keyword, type: string, required: true, label: { en_US: Keyword, zh_Hans: 关键词 }, form: llm, human_description: { en_US: Place category or name, zh_Hans: 地点名或类别 } }
+  - { name: region, type: string, required: true, label: { en_US: City, zh_Hans: 城市 }, form: llm, human_description: { en_US: City name, zh_Hans: 城市名 } }
+  - { name: page_size, type: number, required: false, default: 10, label: { en_US: Result count, zh_Hans: 结果数 }, form: llm, human_description: { en_US: 1 to 20, zh_Hans: 1 至 20 } }
+output_schema: { type: object, properties: { result: { type: array } } }
+extra: { python: { source: tools/poi_search.py } }
