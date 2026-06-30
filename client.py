@@ -150,8 +150,15 @@ class TencentMapClient:
         if mode == "transit":
             polyline = self._decode_transit(route)
         else:
-            encoded = route.get("polyline") or ""
-            polyline = decode_polyline(encoded) if encoded else []
+            raw_poly = route.get("polyline")
+            if isinstance(raw_poly, str) and raw_poly:
+                polyline = decode_polyline(raw_poly)
+            elif isinstance(raw_poly, list) and raw_poly:
+                # API 直接返回坐标数组（如 [[lat,lng], ...]）
+                try:
+                    polyline = [[float(p[0]), float(p[1])] for p in raw_poly]
+                except Exception:
+                    polyline = []
         return {
             "distance_meters": route.get("distance", 0),
             "duration_minutes": round((route.get("duration") or 0) / 60, 2),
@@ -163,9 +170,16 @@ class TencentMapClient:
         points = []
         for step in route.get("steps", []):
             for line in step.get("lines", []):
-                encoded = line.get("polyline") or ""
-                if encoded:
-                    seg = decode_polyline(encoded)
+                raw_poly = line.get("polyline")
+                seg: list[list[float]] = []
+                if isinstance(raw_poly, str) and raw_poly:
+                    seg = decode_polyline(raw_poly)
+                elif isinstance(raw_poly, list) and raw_poly:
+                    try:
+                        seg = [[float(p[0]), float(p[1])] for p in raw_poly]
+                    except Exception:
+                        seg = []
+                if seg:
                     if points and seg and points[-1] == seg[0]:
                         points.extend(seg[1:])
                     else:

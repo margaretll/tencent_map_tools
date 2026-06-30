@@ -1,4 +1,4 @@
-version: 0.1.7
+version: 0.1.8
 type: plugin
 author: margaretll
 name: tencent_map_tools
@@ -18,7 +18,7 @@ plugins:
   tools:
     - provider/tencent_map.yaml
 meta:
-  version: 0.1.7
+  version: 0.1.8
   arch: [amd64, arm64]
   runner:
     language: python
