@@ -201,13 +201,18 @@ class TencentMapClient:
         self,
         city: str,
         days: int,
-        start_date: str,
-        interests: List[str],
-        travel_mode: str,
-        locale: str,
+        locale: str = "zh",
     ) -> Dict[str, Any]:
+        """生成行程规划（只需城市和天数）"""
         days = max(1, min(7, int(days)))
-        travel_mode = travel_mode if travel_mode in ("driving", "transit", "walking", "bicycling") else "walking"
+        travel_mode = "walking"  # 内置默认值
+        
+        # 内置默认兴趣（覆盖历史文化、美食、自然、夜生活）
+        interests: List[str] = ["文化", "美食", "自然", "夜生活"]
+        
+        # 内置默认出发日期（今天）
+        from datetime import date as date_type
+        start_date = date_type.today().isoformat()
 
         # 兴趣关键词映射（支持中英文）
         keyword_map: Dict[str, List[str]] = {

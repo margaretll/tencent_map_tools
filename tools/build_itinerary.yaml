@@ -5,9 +5,6 @@ description:
 parameters:
   - { name: city, type: string, required: true, label: { en_US: City, zh_Hans: 城市 }, form: llm, human_description: { en_US: Destination city, zh_Hans: 目的地城市 } }
   - { name: days, type: number, required: true, label: { en_US: Days, zh_Hans: 天数 }, form: llm, human_description: { en_US: 1 to 7, zh_Hans: 1 至 7 天 } }
-  - { name: start_date, type: string, required: true, label: { en_US: Start date, zh_Hans: 出发日期 }, form: llm, human_description: { en_US: YYYY-MM-DD, zh_Hans: YYYY-MM-DD } }
-  - { name: interests, type: string, required: true, label: { en_US: Interests, zh_Hans: 兴趣 }, form: llm, human_description: { en_US: Comma-separated interest keys, zh_Hans: 逗号分隔的兴趣键 } }
-  - { name: travel_mode, type: string, required: true, label: { en_US: Travel mode, zh_Hans: 出行方式 }, form: llm, human_description: { en_US: transit/walking/driving/bicycling, zh_Hans: transit/walking/driving/bicycling } }
-  - { name: locale, type: string, required: true, label: { en_US: Locale, zh_Hans: 语言 }, form: llm, human_description: { en_US: zh or en, zh_Hans: zh 或 en } }
+  - { name: locale, type: string, required: false, label: { en_US: Locale, zh_Hans: 语言 }, form: llm, human_description: { en_US: zh or en, zh_Hans: zh 或 en } }
 output_schema: { type: object, properties: { itinerary_json: { type: string } } }
 extra: { python: { source: tools/build_itinerary.py } }
