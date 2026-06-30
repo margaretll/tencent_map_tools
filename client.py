@@ -70,8 +70,6 @@ class TencentMapClient:
             "boundary": f"region({region},0)",
             "page_size": max(1, min(20, page_size)),
             "page_index": 1,
-            "get_rich": 1,
-            "added_fields": "star_level,avg_price,opening_hours",
         })
         pois = []
         for item in payload.get("data", []):
