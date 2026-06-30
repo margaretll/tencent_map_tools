@@ -15,8 +15,8 @@ resource:
     tool:
       enabled: true
 plugins:
-tools:
-  - provider/tencent_map.yaml
+  tools:
+    - provider/tencent_map.yaml
 meta:
   version: 0.1.9
   arch: [amd64, arm64]
