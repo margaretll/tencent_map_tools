@@ -1,4 +1,4 @@
-version: 0.1.8
+version: 0.1.9
 type: plugin
 author: margaretll
 name: tencent_map_tools
@@ -6,8 +6,8 @@ label:
   en_US: Tencent Map Tools
   zh_Hans: 腾讯地图工具
 description:
-  en_US: Read-only Tencent Map POI, geocoding, route and itinerary tools.
-  zh_Hans: 只读的腾讯地图 POI、地理编码、路线与行程工具。
+  en_US: Read-only Tencent Map POI, geocoding, route and itinerary tools. Supports multi-category search and rich data (rating/price) for paid API keys.
+  zh_Hans: 只读的腾讯地图 POI、地理编码、路线与行程工具。支持多类别搜索，付费 Key 可获取评分/价格等丰富字段。
 icon: icon.svg
 resource:
   memory: 268435456
@@ -15,10 +15,10 @@ resource:
     tool:
       enabled: true
 plugins:
-  tools:
-    - provider/tencent_map.yaml
+tools:
+  - provider/tencent_map.yaml
 meta:
-  version: 0.1.8
+  version: 0.1.9
   arch: [amd64, arm64]
   runner:
     language: python

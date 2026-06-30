@@ -4,10 +4,33 @@ identity:
   label: { en_US: POI Search, zh_Hans: POI 搜索 }
 description:
   human: { en_US: Search verified Tencent Map places., zh_Hans: 搜索腾讯地图真实地点。 }
-  llm: Search verified POIs by keyword and city. Never invent missing places.
+  llm: "Search verified POIs by keyword and city. Returns real-time data including name, address, location, category. If using a paid API key, also returns rating/price/opening hours. Use this BEFORE generating itinerary to get real POI data."
 parameters:
-  - { name: keyword, type: string, required: true, label: { en_US: Keyword, zh_Hans: 关键词 }, form: llm, human_description: { en_US: Place category or name, zh_Hans: 地点名或类别 } }
-  - { name: region, type: string, required: true, label: { en_US: City, zh_Hans: 城市 }, form: llm, human_description: { en_US: City name, zh_Hans: 城市名 } }
+  - { name: keyword, type: string, required: true, label: { en_US: Keyword, zh_Hans: 关键词 }, form: llm, human_description: { en_US: Place category or name (e.g. '景点', '美食', '博物馆'), zh_Hans: 地点名或类别（如'景点'、'美食'、'博物馆'） } }
+  - { name: city, type: string, required: true, label: { en_US: City, zh_Hans: 城市 }, form: llm, human_description: { en_US: City name, zh_Hans: 城市名 } }
   - { name: page_size, type: number, required: false, default: 10, label: { en_US: Result count, zh_Hans: 结果数 }, form: llm, human_description: { en_US: 1 to 20, zh_Hans: 1 至 20 } }
-output_schema: { type: object, properties: { result: { type: array } } }
+  - { name: get_rich, type: boolean, required: false, default: true, label: { en_US: Get rich fields, zh_Hans: 获取丰富字段 }, form: llm, human_description: { en_US: Try to get rating/price/opening hours (requires paid key), zh_Hans: 尝试获取评分/价格/开放时间（需要付费 Key） } }
+output_schema:
+  type: object
+  properties:
+    result:
+      type: array
+      items:
+        type: object
+        properties:
+          tencent_poi_id: { type: string, description: "腾讯地图 POI ID" }
+          name: { type: string, description: "地点名称" }
+          address: { type: string, description: "详细地址" }
+          category: { type: string, description: "分类（如'旅游景点'）" }
+          location: 
+            type: object
+            properties:
+              lat: { type: number, description: "纬度" }
+              lng: { type: number, description: "经度" }
+          rating: { type: number, description: "评分（1-5），仅付费 Key 返回" }
+          average_price: { type: number, description: "人均价格，仅付费 Key 返回" }
+          opening_hours: { type: string, description: "开放时间，仅付费 Key 返回" }
+          phone: { type: string, description: "电话，仅付费 Key 返回" }
+          city: { type: string, description: "所属城市" }
+          district: { type: string, description: "所属区县" }
 extra: { python: { source: tools/poi_search.py } }

@@ -1,0 +1,32 @@
+identity:
+  name: poi_search_multi
+  author: margaretll
+  label: { en_US: POI Search Multi, zh_Hans: POI 批量搜索 }
+description:
+  human: { en_US: Search multiple categories at once., zh_Hans: 一次搜索多个类别的地点。 }
+  llm: "Search POIs by multiple keywords in one call. Returns categorized results. Use this to get a comprehensive POI list (scenic + food + culture) before building itinerary."
+parameters:
+  - { name: keywords, type: string, required: true, label: { en_US: Keywords, zh_Hans: 关键词列表 }, form: llm, human_description: { en_US: Comma-separated keywords (e.g. '景点,美食,文化'), zh_Hans: 逗号分隔的关键词（如'景点,美食,文化'） } }
+  - { name: city, type: string, required: true, label: { en_US: City, zh_Hans: 城市 }, form: llm, human_description: { en_US: City name, zh_Hans: 城市名 } }
+  - { name: page_size_per_keyword, type: number, required: false, default: 10, label: { en_US: Results per keyword, zh_Hans: 每类结果数 }, form: llm, human_description: { en_US: 1 to 20, zh_Hans: 1 至 20 } }
+  - { name: get_rich, type: boolean, required: false, default: true, label: { en_US: Get rich fields, zh_Hans: 获取丰富字段 }, form: llm, human_description: { en_US: Try to get rating/price/opening hours (requires paid key), zh_Hans: 尝试获取评分/价格/开放时间（需要付费 Key） } }
+output_schema:
+  type: object
+  properties:
+    keywords:
+      type: array
+      items: { type: string }
+    results:
+      type: object
+      description: "按关键词分组的 POI 列表"
+    all_pois:
+      type: array
+      items:
+        type: object
+        properties:
+          name: { type: string }
+          category: { type: string }
+          rating: { type: number }
+          location: { type: object }
+    total_count: { type: number }
+extra: { python: { source: tools/poi_search_multi.py } }

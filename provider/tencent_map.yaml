@@ -20,6 +20,7 @@ credentials_for_provider:
       zh_Hans: 请使用服务端 Key，并在腾讯位置服务控制台限制用途。
 tools:
   - tools/poi_search.yaml
+  - tools/poi_search_multi.yaml
   - tools/poi_detail.yaml
   - tools/geocoder.yaml
   - tools/direction.yaml

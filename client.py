@@ -84,29 +84,104 @@ class TencentMapClient:
     # ----------------------------------------------------------------
     # POI 搜索
     # ----------------------------------------------------------------
-    def search_pois(self, keyword: str, city: str, page_size: int = 20, page_index: int = 1) -> List[Dict[str, Any]]:
-        """按城市关键词搜索 POI，返回标准化列表"""
+    def search_pois(self, keyword: str, city: str, page_size: int = 20, page_index: int = 1, get_rich: bool = True) -> List[Dict[str, Any]]:
+        """按城市关键词搜索 POI，返回标准化列表
+        
+        Args:
+            get_rich: 是否尝试获取丰富字段（评分/价格/开放时间），付费 Key 可用。
+                      如果付费 Key 也无此权限，自动降级为基础字段。
+        """
         params: Dict[str, Any] = {
             "keyword": keyword,
             "boundary": f"region({city})",
             "page_size": min(page_size, 20),
             "page_index": page_index,
         }
-        # 不加 get_rich/added_fields，避免 113（免费 Key 无此权限）
-        data = self._ws_get("/ws/place/v1/search", params)
+        
+        # 尝试获取丰富字段（付费 Key 可用，免费 Key 会返回 113 错误）
+        if get_rich:
+            params["get_rich"] = 1
+            params["added_fields"] = _RICH_ADDED_FIELDS
+        
+        try:
+            data = self._ws_get("/ws/place/v1/search", params)
+        except TencentMapError as e:
+            # 如果是因为无权限（113），则降级为基础搜索
+            if e.code == 113 and get_rich:
+                params.pop("get_rich", None)
+                params.pop("added_fields", None)
+                data = self._ws_get("/ws/place/v1/search", params)
+            else:
+                raise
+        
         raw_list = data.get("data") or []
         results: List[Dict[str, Any]] = []
         for p in raw_list:
             loc = p.get("location") or {}
-            results.append({
+            detail = p.get("detail") or {}
+            ad_info = p.get("ad_info") or {}
+            
+            # 提取所有可用字段
+            poi = {
                 "tencent_poi_id": p.get("id", ""),
                 "name": p.get("title", ""),
                 "address": p.get("address", ""),
                 "category": p.get("category", ""),
                 "location": {"lat": loc.get("lat") or 0.0, "lng": loc.get("lng") or 0.0},
-                "average_price": (p.get("detail") or {}).get("average_price"),
-            })
+                "distance": p.get("distance"),  # 如果有定位搜索
+                "city": ad_info.get("city", ""),
+                "district": ad_info.get("district", ""),
+            }
+            
+            # 丰富字段（可能需要付费 Key）
+            if detail:
+                poi["rating"] = detail.get("star_level")  # 评分
+                poi["average_price"] = detail.get("avg_price")  # 均价
+                poi["opening_hours"] = detail.get("opening_hours")  # 开放时间
+                poi["phone"] = detail.get("tel")  # 电话
+                poi["description"] = detail.get("brief")  # 简介
+            
+            results.append(poi)
+        
         return results
+
+    def search_pois_multi(self, keywords: List[str], city: str, page_size_per_keyword: int = 10, get_rich: bool = True) -> Dict[str, Any]:
+        """按多个关键词搜索 POI，返回按类别分组的结果
+        
+        Args:
+            keywords: 关键词列表（如 ["景点", "美食", "文化"]）
+            city: 城市名
+            page_size_per_keyword: 每个关键词返回的结果数
+            get_rich: 是否尝试获取丰富字段
+            
+        Returns:
+            {
+                "keywords": ["景点", "美食"],
+                "results": {
+                    "景点": [...],
+                    "美食": [...]
+                },
+                "all_pois": [...]  # 所有结果的扁平列表
+            }
+        """
+        results_by_keyword = {}
+        all_pois = []
+        
+        for keyword in keywords:
+            try:
+                pois = self.search_pois(keyword, city, page_size_per_keyword, 1, get_rich)
+                results_by_keyword[keyword] = pois
+                all_pois.extend(pois)
+            except Exception as e:
+                # 某个关键词搜索失败不影响其他关键词
+                results_by_keyword[keyword] = []
+        
+        return {
+            "keywords": keywords,
+            "results": results_by_keyword,
+            "all_pois": all_pois,
+            "total_count": len(all_pois)
+        }
 
     # ----------------------------------------------------------------
     # POI 详情
