@@ -1,4 +1,4 @@
-identity: { name: build_itinerary, author: liuxin, label: { en_US: Build Itinerary, zh_Hans: 生成真实行程 } }
+identity: { name: build_itinerary, author: margaretll, label: { en_US: Build Itinerary, zh_Hans: 生成真实行程 } }
 description:
   human: { en_US: Build a structured itinerary from verified POIs and routes., zh_Hans: 基于真实 POI 与路线生成结构化行程。 }
   llm: Build the final itinerary JSON. All POIs and coordinates come from Tencent Map; costs are estimates.

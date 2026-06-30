@@ -1,6 +1,6 @@
 identity:
   name: poi_search
-  author: liuxin
+  author: margaretll
   label: { en_US: POI Search, zh_Hans: POI 搜索 }
 description:
   human: { en_US: Search verified Tencent Map places., zh_Hans: 搜索腾讯地图真实地点。 }

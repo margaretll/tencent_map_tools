@@ -1,4 +1,4 @@
-identity: { name: geocoder, author: liuxin, label: { en_US: Geocoder, zh_Hans: 地址解析 } }
+identity: { name: geocoder, author: margaretll, label: { en_US: Geocoder, zh_Hans: 地址解析 } }
 description:
   human: { en_US: Convert an address to GCJ-02 coordinates., zh_Hans: 将地址转换为 GCJ-02 坐标。 }
   llm: Resolve a Chinese address or landmark to verified GCJ-02 coordinates.

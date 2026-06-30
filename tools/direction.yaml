@@ -1,4 +1,4 @@
-identity: { name: direction, author: liuxin, label: { en_US: Route Planning, zh_Hans: 路线规划 } }
+identity: { name: direction, author: margaretll, label: { en_US: Route Planning, zh_Hans: 路线规划 } }
 description:
   human: { en_US: Plan a real Tencent Map route., zh_Hans: 规划腾讯地图真实路线。 }
   llm: Plan a route between two addresses using driving, walking, transit or bicycling.
