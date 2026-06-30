@@ -140,30 +140,53 @@ class TencentMapClient:
     ) -> dict[str, Any]:
         days = max(1, min(7, int(days)))
         keyword_map = {
-            "culture": "博物馆", "food": f"{city}烤鸭", "shopping": "热门商圈", "history": "历史博物馆",
-            "nature": "自然风景区", "nightlife": "酒吧街", "art": "美术馆", "technology": "科技馆",
+            "culture": ["博物馆", "文化场馆"],
+            "food": [f"{city}美食", f"{city}烤鸭"],
+            "shopping": ["热门商圈", "购物中心"],
+            "history": ["历史博物馆", "古迹", "文化遗址"],
+            "nature": ["自然风景区", "公园"],
+            "nightlife": ["酒吧街", "夜景"],
+            "art": ["美术馆", "艺术馆"],
+            "technology": ["科技馆", "科技博物馆"],
+            "文化": ["博物馆", "文化场馆"],
+            "美食": [f"{city}美食", f"{city}烤鸭"],
+            "购物": ["热门商圈", "购物中心"],
+            "历史": ["历史博物馆", "古迹", "文化遗址"],
+            "自然": ["自然风景区", "公园"],
+            "夜生活": ["酒吧街", "夜景"],
+            "艺术": ["美术馆", "艺术馆"],
+            "科技": ["科技馆", "科技博物馆"],
         }
         interest_pools: dict[str, list[dict[str, Any]]] = {}
         seen: set[str] = set()
         for interest in interests:
+            keywords = keyword_map.get(interest, [interest])
+            if isinstance(keywords, str):
+                keywords = [keywords]
             pool: list[dict[str, Any]] = []
-            for poi in self.search_pois(keyword_map.get(interest, interest), city, page_size=20):
-                if poi["tencent_poi_id"] not in seen:
-                    poi["interest"] = interest
-                    seen.add(poi["tencent_poi_id"])
-                    pool.append(poi)
+            for kw in keywords:
+                for poi in self.search_pois(kw, city, page_size=20):
+                    if poi["tencent_poi_id"] not in seen:
+                        poi["interest"] = interest
+                        seen.add(poi["tencent_poi_id"])
+                        pool.append(poi)
+                if len(pool) >= 5:
+                    break
             if pool:
                 interest_pools[interest] = pool
 
         candidates = [poi for pool in interest_pools.values() for poi in pool]
         required = days * 3
         if len(candidates) < required:
-            for poi in self.search_pois("必游景点", city, page_size=20):
-                if poi["tencent_poi_id"] not in seen:
-                    poi["interest"] = "culture"
-                    seen.add(poi["tencent_poi_id"])
-                    interest_pools.setdefault("culture", []).append(poi)
-                    candidates.append(poi)
+            for kw in ["必游景点", "热门景点", "著名景点", "旅游景点"]:
+                if len(candidates) >= required:
+                    break
+                for poi in self.search_pois(kw, city, page_size=20):
+                    if poi["tencent_poi_id"] not in seen:
+                        poi["interest"] = "culture"
+                        seen.add(poi["tencent_poi_id"])
+                        interest_pools.setdefault("culture", []).append(poi)
+                        candidates.append(poi)
         if len(candidates) < required:
             raise TencentMapError(f"Only {len(candidates)} valid POIs found; {required} required")
 
